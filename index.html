@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSV Prediction</title>
+    <title>機種予測</title>
     <script>
         async function uploadCSV() {
             const fileInput = document.getElementById('csvFile');
@@ -19,7 +19,7 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTPエラー！ステータス: ${response.status}`);
                 }
 
                 const result = await response.json();  // JSON形式で結果を取得
@@ -27,31 +27,36 @@
                 // 結果を表示するための関数
                 displayResult(result);
             } catch (error) {
-                console.error('Error:', error);
+                console.error('エラー:', error);
             }
         }
 
         function displayResult(result) {
-    const resultDiv = document.getElementById('result');
-    resultDiv.innerHTML = '<h3>Prediction Results:</h3>';
-    
-    result.forEach((jobResult, index) => {
-        resultDiv.innerHTML += `<h4>Job ${index + 1}:</h4>`;
-        
-        // 上位5件のみを表示
-        const top5Results = jobResult.slice(0, 5);  // 上位5件を取得
-        
-        top5Results.forEach(machine => {
-            resultDiv.innerHTML += `<p>Machine: ${machine.Machine}, Probability: ${machine.Probability}</p>`;
-        });
-    });
-}
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<h3>予測結果:</h3>';
+
+            // モデルの精度を表示
+            resultDiv.innerHTML += `<p><strong>正確度:</strong> ${result.accuracy}</p>`;
+            resultDiv.innerHTML += `<p><strong>F1スコア:</strong> ${result.f1_score}</p>`;
+
+            // 各ジョブごとの予測結果を表示
+            result.predictions.forEach((jobResult, index) => {
+                resultDiv.innerHTML += `<h4>ジョブ ${index + 1}:</h4>`;
+                
+                // 上位5件のみを表示
+                const top5Results = jobResult.slice(0, 5);  // 上位5件を取得
+                
+                top5Results.forEach(machine => {
+                    resultDiv.innerHTML += `<p>機種: ${machine.Machine}, 確率: ${machine.Probability}</p>`;
+                });
+            });
+        }
     </script>
 </head>
 <body>
-    <h1>Upload CSV for Prediction</h1>
+    <h1>CSVファイルをアップロードして機種を予測</h1>
     <input type="file" id="csvFile" accept=".csv" />
-    <button onclick="uploadCSV()">Upload and Predict</button>
+    <button onclick="uploadCSV()">アップロードして予測</button>
 
     <div id="result"></div>
 </body>
